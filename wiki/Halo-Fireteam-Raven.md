@@ -27,18 +27,23 @@ The attract loop only starts a game when flag `0x174a220` is set. Only the end o
 
 A player can only join when the adjustment `hardware/p<N>gun` is on. RavenGun seeds `freeplay` and `hardware/p1gun`, `hardware/p2gun` into the writable layer (AdjValStore files, same format as described below).
 
-### Open
+### Open items resolved (measured 2026-10-15)
 
-- Every boot shows the WELCOME setup wizard (TEST begins it; per gun TEST skips calibration; TEST exits the connectivity wizard).
-- The player 2 START (CabStart1) is not yet mapped to a measured switch.
-- Sound on the native route is still silent (FMOD stub).
-- Until these are done the native route stays disabled and Halo plays via the TeknoParrot route.
+1. **WELCOME setup wizard at every boot.** The game shows it while the gun calibration audits are missing (`pmuser/aud/save/gun0Calibration` and `gun1Calibration`). RavenGun now seeds both, so boot goes straight to attract. The aim does not use the game's own calibration (it is given directly as 0..1), so calibrating is not needed.
+2. **"FileSystem integrity test failed! ... Press START or TEST to continue".** The integrity test reads `/pm/g7/halo/game`, and the unpacked executable fails it. RavenGun now runs the unpacked executable from its own path (`/pm/g7/bin/game`) and places the original (`game_original`) at `/pm/g7/halo/game`, so the test reads the original and passes. Result: after a double-click in the app the game boots to attract with FREEPLAY and no messages, without any input (the file test takes about 3 minutes reading from the NAS).
+3. **Player 2 START.** On this cabinet type (STANDARD MOUNTED) the right-hand player is internally player 3 (start `CabStart3`, gun 1, adjustment `p2gun`); RavenGun maps the player 2 start to that switch. Not yet confirmed with a physical second arcade lightgun on the bench.
+
+**Route status: the native route for Halo is now ENABLED** (no TeknoParrot loader). A second 5.5-minute run on the final setup played Mission 1 and the Warthog section. *(Superseded 2026-10-15: the earlier "route stays disabled / plays via BudgieLoader" statements, here and in the section below.)*
+
+### Still open
+
+- Sound on the native route is silent (FMOD stub).
 
 ## 2026-10-15 — native route (own loader, no Wine, no TeknoParrot)
 
 Everything here is **MEASURED** on the bench unless marked **INFERRED**. Addresses are virtual addresses in the game binary `g7/halo/game` (33,554,432 bytes, sha256 `e88ba3543d5613c8...`).
 
-**Status.** Halo still *plays* via the TeknoParrot BudgieLoader route (Wine). The goal is the native route: the Linux ELF directly under the system `ld.so` inside a bwrap sandbox, with the NAS folder `g7/halo` as an overlay and a local write layer (`~/.local/share/ravengun/native/Halo/0/upper`); no Wine, no TeknoParrot. The route stays disabled in `packaging/native-games.json` until players can join.
+**Status.** Halo still *plays* via the TeknoParrot BudgieLoader route (Wine). *(Superseded 2026-10-15: the native route now plays too.)* The goal is the native route: the Linux ELF directly under the system `ld.so` inside a bwrap sandbox, with the NAS folder `g7/halo` as an overlay and a local write layer (`~/.local/share/ravengun/native/Halo/0/upper`); no Wine, no TeknoParrot. The route stays disabled in `packaging/native-games.json` until players can join. *(Superseded 2026-10-15: the route is now enabled; see the section above.)*
 
 ### Input fix
 
@@ -96,7 +101,7 @@ From earlier research (`patches/Halo/AIM-GELEZEN.md` in the ravengun-patches rep
 - Halo passes ioctl request numbers sign-extended (`0xffffffff80685600` for `VIDIOC_QUERYCAP`); only the low 32 bits count.
 - Halo uses V4L2 **MMAP** streaming (`REQBUFS` count 16, memory MMAP, 640x480 YUYV, buffers of 614400 bytes) and calls `mmap` through the same old GOT. This corrects the earlier note that the game uses read I/O. The library hands out anonymous memory per buffer and fills it on `DQBUF`.
 - The identification compares each camera's value against 80 (`cmp $0x50` at `0x4547a1`); exactly one camera must exceed it. Results: constant black frames gave `Could not ID device for player 0 (16, 16, 0, 0)`; one constantly bright camera gave `Could not auto-ID devices: 0 webcams ID'd, 2 webcams present`. So the game now sees two QR scanners present, and the auto-ID measures a brightness *change* during a flash, not constant brightness.
-- The native route stays disabled; Halo keeps playing through BudgieLoader.
+- The native route stays disabled; Halo keeps playing through BudgieLoader. *(Superseded 2026-10-15: the route is now enabled.)*
 
 ### Cabinet type, dongle and guns
 
