@@ -4,6 +4,61 @@
 
 RavenGun ships no games; you need your own copy of the game folder.
 
+## 2026-10-15 — native route (own loader, no Wine, no TeknoParrot)
+
+Everything here is **MEASURED** on the bench unless marked **INFERRED**. Addresses are virtual addresses in the game binary `g7/halo/game` (33,554,432 bytes, sha256 `e88ba3543d5613c8...`).
+
+**Status.** Halo still *plays* via the TeknoParrot BudgieLoader route (Wine). The goal is the native route: the Linux ELF directly under the system `ld.so` inside a bwrap sandbox, with the NAS folder `g7/halo` as an overlay and a local write layer (`~/.local/share/ravengun/native/Halo/0/upper`); no Wine, no TeknoParrot. The route stays disabled in `packaging/native-games.json` until players can join.
+
+### Input fix
+
+The input shim (`tools/rt-input-shim`, `librg_rt_input.so`) read `/dev/shm/TeknoParrot_JvsState`, which was stale; the daemon writes `/dev/shm/ravengun_JvsState`. After pointing shim and profile at `ravengun_JvsState` (loader commit `185ef71`), START skips the FileSystem Integrity Test and the gun calibration screens and the game reaches its attract loop. TEST does nothing on the calibration screen (confirmed again).
+
+### Coins and free play
+
+- The built-in coin pulse of 14 ms is mostly missed by the game (4 presses gave +$0.25). With 60 ms it over-counts (4 presses gave up to +$3.25).
+- Settings live in `pmuser/adj/save/<category>/<name>.{0,1,2}.txt`. File format: uint32 `20` (little endian), then the SHA-1 of the body (20 bytes), then uint32 body length, then the body. The body is the text `# RTDT Data Type AdjValStore\r\nname = <name>\r\nversion = 0\r\ntime_set = 1\r\nval = <value>\r\n` plus a terminating NUL byte.
+- Writing `playerCost/freeplay.{0,1,2}.txt` with `val = 1` into the local write layer makes the attract loop show FREEPLAY.
+
+### Sound (FMOD)
+
+- The game links `libfmod.so.10` and `libfmodstudio.so.10` (FMOD Studio 1.10) and resolves 60 FMOD names itself, including the C++ Studio API (`FMOD::Studio::Bus`, `EventInstance`, `ChannelControl`).
+- Audio data: 11 RIFF FMOD Studio banks in `data/snd/banks` (attract, diag, level1-6, MasterBank, MasterBank.strings, perm), 917 samples in total, all FSB5 Vorbis.
+- The FMOD package on the NAS (`fmodapi44464linux`, FMOD Ex/Designer 4.44.64: `libfmodex`, `libfmodevent`) is the wrong API generation and cannot be used. TeknoParrot's BudgieLoader uses the Windows `fmod64.dll` / `fmodstudio64.dll` 1.10.2.
+- The old RavenGun stub returned error 52 for everything, which logged `Failed to load FMOD sound bank: attract/level1/level2 (ec 52)`. It is now a "silent FMOD": every call returns `FMOD_OK` with valid dummy objects (`tools/fmod-stub`, `scripts/build-fmod-stub.sh`, commit `185ef71`).
+- Plan, **not built yet**: an FMOD Studio to PipeWire wrapper with 5.1 output (parse the Studio banks, decode FSB5 Vorbis, mix), like DXVK but for audio.
+
+### Why START does not start a game: the guns are cameras
+
+A player can only join with a gun, and Halo's guns are cameras. Game log: `Webcam: Could not ID device for player 0 (0, 0, 0, 0)` and `Webcam: Aborting auto-id. All webcams reported brightness difference of 0.`
+
+Code read with `objdump` on the raw image (the file has no section headers): `objdump -D -b binary -m i386:x86-64 --adjust-vma=0x400000`. The code references strings with absolute `mov $addr`.
+
+- Webcam init at `0x49cdb0`: skips if byte `[0x1766561] != 0`; stores `time()` at `0x1c1f140`; calls the enumerator `0x49cc10`; then starts up to 4 devices (`0x49c300`) and prints `Webcam init successfully started %u devices!` on stdout.
+- Enumerator `0x49cc10`: `popen("ls -1 /dev/video*")`, `getline` per line, `open(path, O_RDWR|O_NONBLOCK)`, `ioctl VIDIOC_QUERYCAP`; keeps the device if `device_caps` has VIDEO_CAPTURE. Device table at `0x1766580`, `0x206` bytes per device, maximum 4.
+- Auto-identification (screen flash, per-camera brightness difference) is around `0x44e8xx` and `0x4548xx`. A stored ordering is used (`0x454d54`) only when the stored count equals the number of devices present (checked per device via `0x49d730`).
+- The game finds cameras by enumerating `/dev/video*`, also runs `find /sys/devices/ -iname 'video*' | grep video4linux/%s`, supports YUYV and MJPG, and imports `open/ioctl/read/select/poll/close` but not `mmap` (V4L2 read I/O).
+
+### Two GOTs: why plain LD_PRELOAD does not reach the game
+
+The game binary is a rebuilt dump with two GOTs. The official JUMP_SLOT relocations are at `0x238dxxx`, but the code's PLT stubs jump through an older GOT at `0x1691xxx` (e.g. PLT `0x40d990` to GOT `0x1691250` = `open`) that is already filled with libc addresses before `LD_PRELOAD` constructors run. So ordinary `LD_PRELOAD` interposition does not reach the game.
+
+RavenGun's new virtual-webcam library (`tools/v4l2-fake`, `librg_v4l2_fake.so`) therefore patches both: the relocations by symbol name, and a scan of the game's writable segments for pointers equal to libc's `open/open64/ioctl/read/close`. Measured afterwards: GOT `0x1691250` points into `librg_v4l2_fake.so`.
+
+### Virtual webcams (in progress, not working yet)
+
+Native profile key `"fake_video": N` binds `/dev/null` to `/dev/video0..N-1` in the sandbox and sets `RG_V4L2_FAKE`. The library answers `open/ioctl/read` for those paths with YUYV frames at 60 fps (tested outside the game). Inside the game the device table at `0x1766580` is still empty and the init guard byte is already 1; under investigation.
+
+### Aim
+
+From earlier research (`patches/Halo/AIM-GELEZEN.md` in the ravengun-patches repo): the aim getter at `0xdd5c60` reads a per-player gate byte at `0x1aa37c0` (must be <= 3) and the aim pair (float x, y) at `0x1f392a0 + 8*player`. Earlier runs showed player count `[0x1f392d0] = 0` and the per-player structure pointer `[0x181f7e0] = NULL`, because no gun/player is attached.
+
+### Next steps
+
+1. Get the virtual webcams found and assigned to players (stored ordering, or answer the brightness auto-ID).
+2. Feed aim and trigger from RavenGun's input into the aim pair.
+3. Then the FMOD wrapper for sound.
+
 ## 1. Platform and cabinet
 
 - Raw Thrills "PC Based" lightgun cabinet, 2018, with the cabinet's own Linux image. **MEASURED** from the files: `game` is a **64-bit Linux ELF** (`ET_EXEC`, x86-64), not a Windows program. The folder layout on the cabinet is `/pm/g7/halo` with `game`, `game_original`, `halo.so`, `data/`, `eFileMaps/` and `utils/` (cabinet scripts).
@@ -53,7 +108,7 @@ Layout = WartranTroopers
 
 No TeknoParrot front-end is started (`pgrep -x TeknoParrotUi` found nothing during the runs). Input comes from the RavenGun engine through the `tp-shm` shared-memory I/O bridge. The loader prints `Warning SHT_DYNSYM not found in section headers` for this game; that is harmless (the file simply has no section headers, the symbols are found through the dynamic segment) and also appears with games that run fine.
 
-**Native Linux route (also working).** The ELF is started by the kernel's own `ld.so` inside a bubblewrap sandbox with `LD_PRELOAD=/pm/g7/halo/halo.so:<RavenGun input helper>`. Working directory and `HOME` are `/pm/g7/halo`, arguments `-f1920x1080 -n`, the game folder is a read-only lower layer with a writable overlay. Gamescope draws the picture. A stub that exports the two FMOD library names and returns error code 52 lets the game run without sound. **MEASURED.**
+**Native Linux route (also working).** The ELF is started by the kernel's own `ld.so` inside a bubblewrap sandbox with `LD_PRELOAD=/pm/g7/halo/halo.so:<RavenGun input helper>`. Working directory and `HOME` are `/pm/g7/halo`, arguments `-f1920x1080 -n`, the game folder is a read-only lower layer with a writable overlay. Gamescope draws the picture. A stub that exports the two FMOD library names and returns error code 52 lets the game run without sound. **MEASURED.** *(Superseded 2026-10-15: the stub is now a "silent FMOD" returning `FMOD_OK`; and the native route cannot start a game yet because the guns are cameras. See the 2026-10-15 section above.)*
 
 Pass `--tpui --route evdev` only if you want to go through TeknoParrot's own front-end; the double-click route does not need it.
 
@@ -109,13 +164,13 @@ Messages that stay on the attract screen: `QR scanners need to be configured!`, 
 - **Working** via double-click (5 min 12 s, played on the TV, 2026-10-14). The five-minute bar is met on both routes (attract loop and played game).
 - Not yet played with the real PS Move on the double-click route.
 - Open: the QR / factory-setup messages. The strings belong to attract states (`ATTRACT_FACTORY_SETUP_INCOMP`, `ATTRACT_WEBCAM_CONFIG`, `ATTRACT_GUN%i_MISSING`); the factory setup is an item in the cabinet's DIAG (TEST) menu. **INFERRED** from names in the binary; running that menu item in the attract loop has not been tried.
-- Open: sound on the native route (needs the FMOD stub; nothing is heard).
+- Open: sound on the native route (needs the FMOD stub; nothing is heard). *(Superseded 2026-10-15: the silent FMOD stub exists; real sound needs the planned FMOD Studio to PipeWire wrapper.)*
 - Open: whether the second player and the four-player variants work in play; only player 1 was exercised.
 
 ## 9. What we tried and what did not work
 
 - **"TEST skips the calibration" on the native route**: measured false. Six TEST pulses on all four boards changed nothing; START alone worked. (On the Wine route TEST twice does skip it.)
-- **Optical aim**: we read the camera "brightness difference" lines and concluded the guns are tracked by the webcams. Withdrawn: aim runs through the board channels of the `WartranTroopers` layout, and the webcam step also failed on days when the game reached attract.
+- **Optical aim**: we read the camera "brightness difference" lines and concluded the guns are tracked by the webcams. Withdrawn: aim runs through the board channels of the `WartranTroopers` layout, and the webcam step also failed on days when the game reached attract. *(Superseded 2026-10-15: on the native route a player can only join with a webcam gun; the game log says `Could not ID device for player 0`. See the 2026-10-15 section above.)*
 - **Joystick / SDL hypothesis**: refuted. During calibration the game holds no `/dev/input` device open and has not loaded SDL, so an extra virtual device is not the route.
 - **A crash in our own helper** (SIGBUS in the input helper): the shared image was truncated while mapped. Fixed by reading with `pread` and writing in place.
 - **A probe that overwrote the helper's default switch table** made TEST fail on every run; removing the probe fixed it. Lesson: do not change two things per run.
