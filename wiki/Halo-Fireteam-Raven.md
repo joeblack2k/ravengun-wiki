@@ -28,7 +28,7 @@ The input shim (`tools/rt-input-shim`, `librg_rt_input.so`) read `/dev/shm/Tekno
 - The old RavenGun stub returned error 52 for everything, which logged `Failed to load FMOD sound bank: attract/level1/level2 (ec 52)`. It is now a "silent FMOD": every call returns `FMOD_OK` with valid dummy objects (`tools/fmod-stub`, `scripts/build-fmod-stub.sh`, commit `185ef71`).
 - Plan, **not built yet**: an FMOD Studio to PipeWire wrapper with 5.1 output (parse the Studio banks, decode FSB5 Vorbis, mix), like DXVK but for audio.
 
-### Why START does not start a game: the guns are cameras
+### Why START does not start a game: the guns are cameras *(superseded, see the update below)*
 
 A player can only join with a gun, and Halo's guns are cameras. Game log: `Webcam: Could not ID device for player 0 (0, 0, 0, 0)` and `Webcam: Aborting auto-id. All webcams reported brightness difference of 0.`
 
@@ -52,6 +52,21 @@ Native profile key `"fake_video": N` binds `/dev/null` to `/dev/video0..N-1` in 
 ### Aim
 
 From earlier research (`patches/Halo/AIM-GELEZEN.md` in the ravengun-patches repo): the aim getter at `0xdd5c60` reads a per-player gate byte at `0x1aa37c0` (must be <= 3) and the aim pair (float x, y) at `0x1f392a0 + 8*player`. Earlier runs showed player count `[0x1f392d0] = 0` and the per-player structure pointer `[0x181f7e0] = NULL`, because no gun/player is attached.
+
+### Update 2026-10-15 (later): corrections
+
+- **Superseded:** "a player can only join with a gun, and Halo's guns are cameras" (and the heading "the guns are cameras"). The webcams in Halo are the **QR scanners** (player login), not the guns. Evidence: the strings `%s/webcamID/qr%i.ppm`, `P1 QR Scanner is not detected!`, `QR scanners need to be configured!`, `ATTRACT_WEBCAM_CONFIG` and `WebcamAutoIdProc`. The webcam auto-ID is therefore not what blocks players from joining.
+- The guns are on a mechanical mount (cabinet type `STANDARD TETHERED`; the calibration screen says "Pull gun all the way back and towards the left ... You should hit the limits of the gun"). Aim comes from analog channels of the IO board: earlier research found that the per-frame player input asks analog channels 793/794 for player 1, at fixed addresses `0x181d418` and `0x181d538`. Separately the binary contains `cmgr_*` code (FTDI, "fpga", "led_data") which looks like an LED/FPGA board, not the aim.
+- **Still OPEN:** why START in the attract loop does not let player 1 join.
+- **Correction:** the webcam init guard `[0x1766561] = 1` is a *mode*, set by `0x49c2c0(mode, 1, 0)` from the cabinet setup code at `0x436520`; it is not a "skip" flag. Init then takes path `0x49ce70` and still enumerates.
+
+### Virtual webcams: measured results (loader commit `28d8127`)
+
+- **Why the game first never opened `/dev/video*`:** `halo.so` (the dump's HASP shim) in `LD_PRELOAD` makes every child process die silently, so `popen("ls -1 /dev/video*")` returned nothing (`getline` gave -1). Proven with `nsenter` into the game's mount namespace: `sh -c 'ls -1 /dev/video*'` prints nothing with `halo.so` preloaded and prints `/dev/video0` and `/dev/video1` without it. Fix: `librg_v4l2_fake.so` clears `LD_PRELOAD` in the game process after loading, so children run clean. This also affects the FileSystem Integrity Test, which runs `sha1sum` via `popen`.
+- Halo passes ioctl request numbers sign-extended (`0xffffffff80685600` for `VIDIOC_QUERYCAP`); only the low 32 bits count.
+- Halo uses V4L2 **MMAP** streaming (`REQBUFS` count 16, memory MMAP, 640x480 YUYV, buffers of 614400 bytes) and calls `mmap` through the same old GOT. This corrects the earlier note that the game uses read I/O. The library hands out anonymous memory per buffer and fills it on `DQBUF`.
+- The identification compares each camera's value against 80 (`cmp $0x50` at `0x4547a1`); exactly one camera must exceed it. Results: constant black frames gave `Could not ID device for player 0 (16, 16, 0, 0)`; one constantly bright camera gave `Could not auto-ID devices: 0 webcams ID'd, 2 webcams present`. So the game now sees two QR scanners present, and the auto-ID measures a brightness *change* during a flash, not constant brightness.
+- The native route stays disabled; Halo keeps playing through BudgieLoader.
 
 ### Next steps
 
