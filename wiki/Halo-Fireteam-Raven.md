@@ -4,6 +4,36 @@
 
 RavenGun ships no games; you need your own copy of the game folder.
 
+## 2026-10-15 (later) — native route plays with arcade lightguns
+
+Everything here is **MEASURED** unless marked otherwise. This section supersedes the "Still open: GUN NOT CONNECTED" item and the "guns are cameras" statements in the section below.
+
+**Result.** On the native route (own loader, no Wine, no TeknoParrot loader) Story Mode was played for 5.5 minutes with trigger, aim and reload working; kills and ammo counters moved; both players' cursors were on screen.
+
+### The arcade lightguns
+
+- The cabinet guns are "IRTrack - Rev. 2" USB cameras (FTDI, VID `0x0403` / PID `0x6001`, manufacturer "Raw Thrills, Inc."). The game talks to them with a statically linked libftdi and reads an ASCII message stream per gun: `X` = IR blobs, `G` = buttons, `Y` = status, with an 8-bit sum checksum through `z`. Full protocol: `ravengun-patches/patches/Halo/IRTRACK-PROTOCOL.md`.
+- New loader component `tools/rt-irtrack` (`librg_irtrack.so`) replaces those libftdi functions inside the game process and presents two healthy IRTrack guns. Buttons go into the `G` message as transition counters (bit 0 = pressed). Aim is given directly through the gun driver's aim getter as 0..1 per axis. The game's Y axis runs bottom to top, so the table inverts Y (measured 0.25 -> 0.75 before the fix). Per-game table: `patches/Halo/irtrack.ini`.
+
+### Why the guns showed "P1/P2 GUN NOT CONNECTED"
+
+Besides the missing devices, the gun subsystem takes its cabinet type from the text `SysInfoGameCabinetType`, which comes from the dongle byte (fileid `0xfff4`, offset `0x29`; value 4 in the dump). With 4 the subsystem starts with zero guns. The table sets that byte to 8 (STANDARD MOUNTED, two guns), the same setting as `CabinetType` in the TeknoParrot profile. The dongle and game files are unchanged.
+
+### "Factory Setup Has Not Been Completed!"
+
+The attract loop only starts a game when flag `0x174a220` is set. Only the end of `FactorySetupProc` sets it (after writing region, serial and a factory flag into the dongle). At this cabinet type the operator path to Factory Setup (the CabDiag handler) is not registered, so TEST in attract does nothing. The input table therefore sets the flag directly (`rt-invoer.ini`).
+
+### Joining a game
+
+A player can only join when the adjustment `hardware/p<N>gun` is on. RavenGun seeds `freeplay` and `hardware/p1gun`, `hardware/p2gun` into the writable layer (AdjValStore files, same format as described below).
+
+### Open
+
+- Every boot shows the WELCOME setup wizard (TEST begins it; per gun TEST skips calibration; TEST exits the connectivity wizard).
+- The player 2 START (CabStart1) is not yet mapped to a measured switch.
+- Sound on the native route is still silent (FMOD stub).
+- Until these are done the native route stays disabled and Halo plays via the TeknoParrot route.
+
 ## 2026-10-15 — native route (own loader, no Wine, no TeknoParrot)
 
 Everything here is **MEASURED** on the bench unless marked **INFERRED**. Addresses are virtual addresses in the game binary `g7/halo/game` (33,554,432 bytes, sha256 `e88ba3543d5613c8...`).
@@ -75,7 +105,7 @@ From earlier research (`patches/Halo/AIM-GELEZEN.md` in the ravengun-patches rep
 - **Cabinet type** is read once from the dongle (fileid `0xfff4` = 65524, byte `0x29`; the dump has 4) through getter `0x5864b0` (`SysInfoGameCabinetType`, valid 1..13) and cached at `0x1800e60`; if the cache already holds a value, the dongle is not read again. Setting the cache (`rt-invoer.ini` rule `zet adres=0x1800e60 breedte=4 waarde=8`, patches commit `f02bc4a`) works:
   - The input-driver table at `0x16f8380..` has descriptors of `0x80` bytes `{type bit, init, connect, poll, data}`. The enabled mask is chosen in `0x436230` from the cabinet type: types 3 and 8 add bit `0x8` (the analog mounted-gun driver: init `0x623f30`; connect `0x624430` which calls `0xdd57e0`, which opens the per-player "port" byte `0x1aa37c0`; poll `0x624110`, which reads analog channels 793/794 at `0x181d418` / `0x181d538`). Other types give mask `0x904`.
   - Measured: type 3 = DUAL-SCREEN MOUNTED (two screens, P1-P4 "GUN NOT CONNECTED"); type 8 = STANDARD MOUNTED (one screen, P1/P2 "GUN NOT CONNECTED"). The mask becomes `0x90c`, the per-player structure pointer `0x181f7e0` is set (it was NULL), and the QR-scanner warnings disappear. TeknoParrot's `CabinetType` options: DUAL-SCREEN MOUNTED, SUPER DELUXE TETHERED, STANDARD MOUNTED, STANDARD TETHERED.
-- **Still open: "GUN NOT CONNECTED".** The driver worker `0x6238a0` calls `0xdd6e00` for type 8, which needs one of the ready flags `0x1aa3424` / `0x1aa3428` and a player count `[0x1f392d0] > 0`. Those are set by the gun subsystem state machine (`0xdd1xxx`, entries at `0x1aa3460` with serial numbers, cf. `GunInfo_AttachedSerials`). In the TeknoParrot route the core emulates these gun devices; natively they still need to be emulated. Halo keeps playing through BudgieLoader meanwhile.
+- **Still open: "GUN NOT CONNECTED".** The driver worker `0x6238a0` calls `0xdd6e00` for type 8, which needs one of the ready flags `0x1aa3424` / `0x1aa3428` and a player count `[0x1f392d0] > 0`. Those are set by the gun subsystem state machine (`0xdd1xxx`, entries at `0x1aa3460` with serial numbers, cf. `GunInfo_AttachedSerials`). In the TeknoParrot route the core emulates these gun devices; natively they still need to be emulated. Halo keeps playing through BudgieLoader meanwhile. *(Superseded 2026-10-15 later: guns now work natively, see the section above.)*
 
 ### Next steps
 
