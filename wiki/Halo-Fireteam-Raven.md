@@ -4,6 +4,17 @@
 
 RavenGun ships no games; you need your own copy of the game folder.
 
+## 2026-10-15 (evening): native route has sound (stereo or LPCM 5.1)
+
+Everything here is **MEASURED**. This resolves the "sound is silent (FMOD stub)" open item.
+
+- Halo needs FMOD Studio 1.10 for Linux (`libfmod.so.10`, `libfmodstudio.so.10`), which is proprietary and not available anywhere on the bench machine or in the game dump. TeknoParrot's own install ships the Windows build of the same version (`fmod64.dll` / `fmodstudio64.dll`, FileVersion 1.10.2 build 92217), which matches the game's banks.
+- RavenGun now has an FMOD wrapper (`tools/fmod-bridge`): small Linux libraries with the 60 FMOD functions Halo uses forward every call over a pipe to a helper (`rg-fmod-host.exe`). The helper runs under Wine inside the game's sandbox and calls the real FMOD 1.10.2 through its C API. Event callbacks are returned with each `update()` and run on the game's thread. RavenGun ships no FMOD files; the DLLs are read from the user's own TeknoParrot install. Without them the game still starts, silently.
+- Halo's own mix is stereo: even with FMOD mixing in 5.1, only front left/right carry sound. For 5.1 the wrapper adds an upmix on FMOD's master: center = L+R, LFE = L+R below 120 Hz, surrounds = L-R delayed 15 ms and rolled off above 7 kHz.
+- New game option in the RavenGun app: "Audio output" = STEREO or LPCM 5.1 (default LPCM 5.1); it applies at the next start.
+- Measured per channel during gameplay: with LPCM 5.1 all channels carry sound (center about -25 dBFS RMS, LFE -25, side -30, rear -36, front -19/-24); with STEREO only front left/right. 5 minutes of Story Mode were played with 5.1.
+- Note: the attract demo is sometimes silent. This is likely the game's operator setting for attract sound, not the wrapper (**INFERRED**).
+
 ## 2026-10-15 (later) — native route plays with arcade lightguns
 
 Everything here is **MEASURED** unless marked otherwise. This section supersedes the "Still open: GUN NOT CONNECTED" item and the "guns are cameras" statements in the section below.
@@ -37,7 +48,7 @@ A player can only join when the adjustment `hardware/p<N>gun` is on. RavenGun se
 
 ### Still open
 
-- Sound on the native route is silent (FMOD stub).
+- Sound on the native route is silent (FMOD stub). *(Resolved 2026-10-15 evening: see the section below. No open items remain here.)*
 
 ## 2026-10-15 — native route (own loader, no Wine, no TeknoParrot)
 
@@ -61,7 +72,7 @@ The input shim (`tools/rt-input-shim`, `librg_rt_input.so`) read `/dev/shm/Tekno
 - Audio data: 11 RIFF FMOD Studio banks in `data/snd/banks` (attract, diag, level1-6, MasterBank, MasterBank.strings, perm), 917 samples in total, all FSB5 Vorbis.
 - The FMOD package on the NAS (`fmodapi44464linux`, FMOD Ex/Designer 4.44.64: `libfmodex`, `libfmodevent`) is the wrong API generation and cannot be used. TeknoParrot's BudgieLoader uses the Windows `fmod64.dll` / `fmodstudio64.dll` 1.10.2.
 - The old RavenGun stub returned error 52 for everything, which logged `Failed to load FMOD sound bank: attract/level1/level2 (ec 52)`. It is now a "silent FMOD": every call returns `FMOD_OK` with valid dummy objects (`tools/fmod-stub`, `scripts/build-fmod-stub.sh`, commit `185ef71`).
-- Plan, **not built yet**: an FMOD Studio to PipeWire wrapper with 5.1 output (parse the Studio banks, decode FSB5 Vorbis, mix), like DXVK but for audio.
+- Plan *(superseded 2026-10-15 evening: built differently, as a bridge to the real FMOD under Wine; see below)*, originally **not built yet**: an FMOD Studio to PipeWire wrapper with 5.1 output (parse the Studio banks, decode FSB5 Vorbis, mix), like DXVK but for audio.
 
 ### Why START does not start a game: the guns are cameras *(superseded, see the update below)*
 
