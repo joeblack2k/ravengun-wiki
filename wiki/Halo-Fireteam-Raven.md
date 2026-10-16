@@ -4,16 +4,29 @@
 
 RavenGun ships no games; you need your own copy of the game folder.
 
-## 2026-10-15 (evening): native route has sound (stereo or LPCM 5.1)
+## 2026-10-15 (evening), updated 2026-10-16: native route has sound (stereo or LPCM 5.1)
 
-Everything here is **MEASURED**. This resolves the "sound is silent (FMOD stub)" open item.
+Everything here is **MEASURED** unless marked. This resolves the "sound is silent (FMOD stub)" open item.
 
-- Halo needs FMOD Studio 1.10 for Linux (`libfmod.so.10`, `libfmodstudio.so.10`), which is proprietary and not available anywhere on the bench machine or in the game dump. TeknoParrot's own install ships the Windows build of the same version (`fmod64.dll` / `fmodstudio64.dll`, FileVersion 1.10.2 build 92217), which matches the game's banks.
-- RavenGun now has an FMOD wrapper (`tools/fmod-bridge`): small Linux libraries with the 60 FMOD functions Halo uses forward every call over a pipe to a helper (`rg-fmod-host.exe`). The helper runs under Wine inside the game's sandbox and calls the real FMOD 1.10.2 through its C API. Event callbacks are returned with each `update()` and run on the game's thread. RavenGun ships no FMOD files; the DLLs are read from the user's own TeknoParrot install. Without them the game still starts, silently.
+**Requirement.** Halo needs FMOD Studio 1.10 for Linux (`libfmod.so.10`, `libfmodstudio.so.10`), which is proprietary. It is not in the game dump and RavenGun ships no FMOD files; each user supplies their own.
+
+### Main path (2026-10-16): native drop-in, no Wine
+
+- Put the 64-bit `libfmod.so.10` and `libfmodstudio.so.10` in `~/.local/share/ravengun/patches/Halo/dropin/fmod/`. Example source: the Linux version of Celeste on Steam ships them in `lib64/` (FMOD 1.10.14); measured: it loads all of Halo's banks.
+- The RavenGun wrapper (`tools/fmod-bridge`, small Linux libraries exporting the 60 FMOD functions Halo uses) loads the drop-in itself and forwards every call directly to it, in the game process.
+- Measured with the drop-in: no Wine process; the game's stream has 6 channels (front L/R, rear L/R, center, LFE). The LFE channel carries almost only content below 200 Hz (-25.8 dBFS full band, -26.1 dBFS below 200 Hz); center -25.8, rears -29.2, fronts -18.9 / -25.1 dBFS RMS. 5 minutes were played with LPCM 5.1.
+
+### Fallback path (2026-10-15): Windows FMOD under Wine
+
+- If there is no drop-in, the same wrapper forwards every call over a pipe to a helper (`rg-fmod-host.exe`) that runs under Wine inside the game's sandbox and calls the real FMOD 1.10.2 through its C API. The DLLs (`fmod64.dll` / `fmodstudio64.dll`, FileVersion 1.10.2 build 92217, matching the game's banks) are read from the user's own TeknoParrot install. Event callbacks are returned with each `update()` and run on the game's thread.
+- Measured per channel during gameplay on this path: with LPCM 5.1 all channels carry sound (center about -25 dBFS RMS, LFE -25, side -30, rear -36, front -19/-24); with STEREO only front left/right. 5 minutes of Story Mode were played with 5.1.
+
+### Order and options
+
+- Order: native drop-in first; otherwise the Windows FMOD 1.10.2 from a TeknoParrot install under Wine; otherwise the game still starts, silently.
 - Halo's own mix is stereo: even with FMOD mixing in 5.1, only front left/right carry sound. For 5.1 the wrapper adds an upmix on FMOD's master: center = L+R, LFE = L+R below 120 Hz, surrounds = L-R delayed 15 ms and rolled off above 7 kHz.
-- New game option in the RavenGun app: "Audio output" = STEREO or LPCM 5.1 (default LPCM 5.1); it applies at the next start.
-- Measured per channel during gameplay: with LPCM 5.1 all channels carry sound (center about -25 dBFS RMS, LFE -25, side -30, rear -36, front -19/-24); with STEREO only front left/right. 5 minutes of Story Mode were played with 5.1.
-- Note: the attract demo is sometimes silent. This is likely the game's operator setting for attract sound, not the wrapper (**INFERRED**).
+- Game option in the RavenGun app: "Audio output" = STEREO or LPCM 5.1 (default LPCM 5.1); it applies at the next start and works the same on both paths.
+- The attract demo is sometimes silent. This is likely the game's operator setting for attract sound, not the wrapper (**INFERRED**).
 
 ## 2026-10-15 (later) — native route plays with arcade lightguns
 
