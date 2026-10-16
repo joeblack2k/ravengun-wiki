@@ -32,7 +32,7 @@ Route = evdev
 AimAspect = 4:3
 ```
 
-Engine settings (from `packaging/native-games.json`): resolution `1024x768`, launched in gamescope, `LD_PRELOAD=librg_ptylink.so:tt_emu.so`, and `TTG_FULLSCREEN=1`, `TTG_CROSSHAIR=1`, `KBD_HOOK=/dev/input/ravengun-kbd`. Your game folder is mounted read-only with a local write layer. The `[Display] AimAspect = 4:3` line makes the daemon's aim space follow the 4:3 picture in the middle of the 16:9 TV.
+Engine settings (from `patches/<Game>/native.json`, the Target Terror Gold folder under `patches/`): resolution `1024x768`, launched in gamescope, `LD_PRELOAD=librg_ptylink.so:tt_emu.so`, and `TTG_FULLSCREEN=1`, `TTG_CROSSHAIR=1`, `KBD_HOOK=/dev/input/ravengun-kbd`. Your game folder is mounted read-only with a local write layer. The `[Display] AimAspect = 4:3` line makes the daemon's aim space follow the 4:3 picture in the middle of the 16:9 TV.
 
 ## 5. Input
 

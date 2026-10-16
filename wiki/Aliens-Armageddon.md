@@ -36,7 +36,7 @@ Route = tp-shm
 Layout = RawThrillsGUN
 ```
 
-The native-route entry in `packaging/native-games.json` is still marked "not tested" and disabled in the app's automatic selection, even though the bench run below reached the game.
+The native-route entry in `patches/<Game>/native.json` (the Aliens Armageddon folder under `patches/`) is still marked "not tested" and disabled in the app's automatic selection, even though the bench run below reached the game.
 
 ## 5. Input
 

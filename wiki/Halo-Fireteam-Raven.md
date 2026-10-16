@@ -67,7 +67,7 @@ A player can only join when the adjustment `hardware/p<N>gun` is on. RavenGun se
 
 Everything here is **MEASURED** on the bench unless marked **INFERRED**. Addresses are virtual addresses in the game binary `g7/halo/game` (33,554,432 bytes, sha256 `e88ba3543d5613c8...`).
 
-**Status.** Halo still *plays* via the TeknoParrot BudgieLoader route (Wine). *(Superseded 2026-10-15: the native route now plays too.)* The goal is the native route: the Linux ELF directly under the system `ld.so` inside a bwrap sandbox, with the NAS folder `g7/halo` as an overlay and a local write layer (`~/.local/share/ravengun/native/Halo/0/upper`); no Wine, no TeknoParrot. The route stays disabled in `packaging/native-games.json` until players can join. *(Superseded 2026-10-15: the route is now enabled; see the section above.)*
+**Status.** Halo still *plays* via the TeknoParrot BudgieLoader route (Wine). *(Superseded 2026-10-15: the native route now plays too.)* The goal is the native route: the Linux ELF directly under the system `ld.so` inside a bwrap sandbox, with the NAS folder `g7/halo` as an overlay and a local write layer (`~/.local/share/ravengun/native/Halo/0/upper`); no Wine, no TeknoParrot. The route stays disabled in `patches/Halo/native.json` until players can join. *(Superseded 2026-10-15: the route is now enabled; see the section above.)*
 
 ### Input fix
 
@@ -84,7 +84,7 @@ The input shim (`tools/rt-input-shim`, `librg_rt_input.so`) read `/dev/shm/Tekno
 - The game links `libfmod.so.10` and `libfmodstudio.so.10` (FMOD Studio 1.10) and resolves 60 FMOD names itself, including the C++ Studio API (`FMOD::Studio::Bus`, `EventInstance`, `ChannelControl`).
 - Audio data: 11 RIFF FMOD Studio banks in `data/snd/banks` (attract, diag, level1-6, MasterBank, MasterBank.strings, perm), 917 samples in total, all FSB5 Vorbis.
 - The FMOD package on the NAS (`fmodapi44464linux`, FMOD Ex/Designer 4.44.64: `libfmodex`, `libfmodevent`) is the wrong API generation and cannot be used. TeknoParrot's BudgieLoader uses the Windows `fmod64.dll` / `fmodstudio64.dll` 1.10.2.
-- The old RavenGun stub returned error 52 for everything, which logged `Failed to load FMOD sound bank: attract/level1/level2 (ec 52)`. It is now a "silent FMOD": every call returns `FMOD_OK` with valid dummy objects (`tools/fmod-stub`, `scripts/build-fmod-stub.sh`, commit `185ef71`).
+- The old RavenGun stub (removed 2026-10-16; the FMOD wrapper now falls back to silence itself) returned error 52 for everything, which logged `Failed to load FMOD sound bank: attract/level1/level2 (ec 52)`. It is now a "silent FMOD": every call returns `FMOD_OK` with valid dummy objects (`tools/fmod-stub`, `scripts/build-fmod-stub.sh`, commit `185ef71`).
 - Plan *(superseded 2026-10-15 evening: built differently, as a bridge to the real FMOD under Wine; see below)*, originally **not built yet**: an FMOD Studio to PipeWire wrapper with 5.1 output (parse the Studio banks, decode FSB5 Vorbis, mix), like DXVK but for audio.
 
 ### Why START does not start a game: the guns are cameras *(superseded, see the update below)*

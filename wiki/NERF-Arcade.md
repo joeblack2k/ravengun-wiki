@@ -33,7 +33,7 @@ Route = tp-shm
 Layout = WartranTroopers
 ```
 
-- Native route entry (`packaging/native-games.json`): `arch = x86_64`, `launcher = gamescope`, executable `/pm/Nerf.x86_64`, working directory and home `/pm`, preload `librg_rio_bridge.so`, environment `RG_RIO_LOG = 1`.
+- Native route entry (`patches/<Game>/native.json`, the NERF folder under `patches/`): `arch = x86_64`, `launcher = gamescope`, executable `/pm/Nerf.x86_64`, working directory and home `/pm`, preload `librg_rio_bridge.so`, environment `RG_RIO_LOG = 1`.
 - **MEASURED** (2026-10-14): no Wine, no loader core and no plug-in loader in the process; `/proc/<pid>/maps` shows none of them.
 - Settings the game saved in the dump (`LocalData/testmenu/prefs`, free play) are used. What the game writes lands in the local write layer under `~/.local/share/ravengun/native/NERF/`.
 - The earlier Windows route (Wine, DXVK, a plug-in loader) is no longer needed.

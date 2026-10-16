@@ -34,7 +34,7 @@ Route = tp-shm
 Layout = RawThrillsGUN
 ```
 
-- Native route entry in `packaging/native-games.json` (`arch = i386`, `loader = rg-elfloader`, `launcher = gamescope`). **MEASURED** (2026-10-14): the process chain is `gamescope -> bwrap -> rg-elfloader`, with `rg-exec --keep DISPLAY` in between so that the game only sees the display variable. A first try without that loaded gamescope's Vulkan layer into zink and showed "Gamescope WSI Layer Error".
+- Native route entry in `patches/<Game>/native.json` (the Jurassic Park folder under `patches/`) (`arch = i386`, `loader = rg-elfloader`, `launcher = gamescope`). **MEASURED** (2026-10-14): the process chain is `gamescope -> bwrap -> rg-elfloader`, with `rg-exec --keep DISPLAY` in between so that the game only sees the display variable. A first try without that loaded gamescope's Vulkan layer into zink and showed "Gamescope WSI Layer Error".
 - The executable is in a layout the system loader cannot start; RavenGun's own loader maps it. `force_glsl_version=120` must stay off (it crashes).
 - **Shader fix (MEASURED):** every boot logged `Failed to load shader: shader108 / 108d / 108c_sk / 108d_sk`. Mesa refuses glow shaders that write both `gl_FragData` and `out_Bloom`; the cabinet's NVIDIA driver allowed it. RavenGun ships replacement shader files (`data/shaders`) bound over the originals in the sandbox. Glow on hit targets is visible afterwards.
 - Harmless log noise: card reader messages (`xicoOpenPort`, `msr100OpenPort`), missing `ifconfig` / `nvidia-settings`.
