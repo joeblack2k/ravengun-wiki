@@ -1,6 +1,6 @@
 # Star Trek Voyager
 
-**Status:** Not working yet. No profile folder and no measurement exist; it needs its own native route.
+**Status:** Skipped (2026-10-17) under the owner's rule for a 4:3 picture without a 16:9 mode: the game opens a 600x450 window (Glide target 640x480) and has no widescreen or aspect option. The game folder is moved aside.
 
 ## 1. Platform and cabinet
 
@@ -17,7 +17,7 @@ Not known.
 
 ## 4. The route we use
 
-No route: an own native route would be needed. The Lindbergh route notes explicitly say it gets no profile on that route.
+Skipped, so no route is kept. The Lindbergh route survey had already shown that the game program `trek.e4` is not one that lindbergh-loader recognises.
 
 ## 5. Input
 
@@ -25,20 +25,20 @@ Not known.
 
 ## 6. Timing
 
-Not measured yet.
+Not measured.
 
 ## 7. What we saw on screen
 
-Nothing: never started.
+Nothing was shown. The 4:3 picture was **MEASURED** in the game's code: the window size is set to 600x450, the Glide target is 640x480, and full screen has no mode of its own.
 
 ## 8. Current state and open questions
 
-- Open: identify the platform and the OS the game expects, then build a route.
-- Not started at all.
+- **Skipped (2026-10-17)** under the owner's rule: Japanese text and/or 4:3 without a 16:9 mode. Reason for this title: 4:3 (measured), with no widescreen or aspect option.
+- Nothing more is planned for this title.
 
 ## 9. What we tried and what did not work
 
-Nothing was tried. It was ruled out as a Lindbergh title.
+Ruled out as a Lindbergh title earlier; nothing else was tried before the title was skipped.
 
 ## 10. What is Linux-specific, and what differs on Windows
 

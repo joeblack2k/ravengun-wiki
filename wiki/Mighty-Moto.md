@@ -1,6 +1,6 @@
 # Mighty Moto
 
-**Status:** Not working yet. Never started: identified only, and it is probably not a lightgun game.
+**Status:** Skipped (2026-10-17) under the owner's rule for a 4:3 picture without a 16:9 mode: the game's own output log shows a 1024x768 desktop and there is no resolution option. The profile is removed and the game folder is moved aside.
 
 ## 1. Platform and cabinet
 
@@ -19,13 +19,7 @@ The cabinet's `SysStart.bat` starts, in order: the SmartFoxServer, `start.exe`, 
 
 ## 4. The route we use
 
-No working route. The profile is a placeholder:
-
-- `[Game] Type = TeknoParrot`, `Executable = motobikeV1.0.9.exe`
-- `[Launch] Mode = direct`
-- `[Input] Route = tp-shm`, `Layout = WartranTroopers` (placeholder; no suitable layout exists)
-
-There is no TeknoParrot profile template for this game, so no emulation profile, config values or board exist. It needs its own start (server plus game) and an input route that does not exist yet.
+Skipped, so no route is kept. The profile was a placeholder (`Type = TeknoParrot`, `Executable = motobikeV1.0.9.exe`, `Route = tp-shm`) with no suitable layout.
 
 ## 5. Input
 
@@ -33,21 +27,21 @@ Unknown. The research notes say it is not a lightgun game (a motorbike game), so
 
 ## 6. Timing
 
-Not measured yet.
+Not measured.
 
 ## 7. What we saw on screen
 
-Nothing: never started.
+**MEASURED** from the cabinet's own `output_log.txt`: a 1024x768 (4:3) desktop; there is no resolution or aspect option. The executable's code section is also stored encrypted, and the game reports that it cannot reach its runtime environment.
 
 ## 8. Current state and open questions
 
-- Never started; nothing measured.
-- Open: a start sequence for the server plus game, and an input route.
-- Low priority: it is not a lightgun title.
+- **Skipped (2026-10-17)** under the owner's rule: Japanese text and/or 4:3 without a 16:9 mode. Reason for this title: 4:3 (measured), with no 16:9 mode.
+- It is also not a lightgun game.
+- Nothing more is planned for this title.
 
 ## 9. What we tried and what did not work
 
-Nothing was tried.
+Nothing was tried at runtime before the title was skipped.
 
 ## 10. What is Linux-specific, and what differs on Windows
 

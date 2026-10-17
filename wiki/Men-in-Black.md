@@ -1,6 +1,6 @@
 # Men in Black
 
-**Status:** Not working yet (parked). The cabinet's shell chain launches the game and it shows its logo, then it exits and restarts in a loop.
+**Status:** Starts (2026-10-17). `MIB.exe` runs directly on RavenGun's own core with DXVK in gamescope, without the cabinet's shell: logo, attract movies, "PRESS START BUTTON TO JOIN" and free play, on screen for 2 minutes. Input has not been measured (on the cabinet it goes through the shell).
 
 ## 1. Platform and cabinet
 
@@ -9,54 +9,54 @@ SEGA Amusements ticket-redemption light-gun cabinet (Windows PC). Build `240913R
 ## 2. What the game needs
 
 - RavenGun ships no games: you need your own copy of the game.
-- Wine with DXVK (`DllOverrides = d3d11,d3d10core,dxgi=n,b`) in a dedicated prefix.
-- Fixed paths under `C:\Sega\` (shell reads `Shell\game.ini`, `Launcher\launcher.ini`, `ShellData`, `GameData`; the game reads `ShellData\ShellData.ini`).
-- The cabinet hardware (an I/O board, a serial line, ticket and card hardware) is provided by RavenGun; this part is not complete yet.
-- The shell and game talk to each other over a local socket.
-- It is the same shell family as [Transformers: Shadows Rising](Transformers-Shadows-Rising), one generation newer.
+- Wine with DXVK (Unity Direct3D 11) in gamescope.
+- 32-bit and 64-bit GStreamer libav plugins for the attract movies (H.264/AAC MP4); without them the game dropped out at the first movie.
+- BepInEx 5.4.21.0 (Mono, 64-bit), fetched by a RavenGun script with a checksum check, and RavenGun's small plugin `RavenGun.MenInBlack` as a drop-in.
+- It is the same shell family as [Transformers: Shadows Rising](Transformers-Shadows-Rising), one generation newer, but the shell is not used.
 
 ## 3. The official start script, or why there is none
 
-The cabinet runs `SystemLauncher.exe` (replaces the Windows shell), which starts `Shell.exe`, which starts `MIB.exe`. The shell refuses to run without a checksum of its own file on its command line (the launcher supplies it on the cabinet).
+The cabinet runs `SystemLauncher.exe`, which starts `Shell.exe`, which starts `MIB.exe`. RavenGun does not start the shell any more: it starts `MIB.exe` itself, like TeknoParrot's own profile for this game does.
 
 ## 4. The route we use
 
-Windows route, direct, on RavenGun's own core, with the cabinet's own chain started (**MEASURED** from `game.ini`):
+Windows route, direct, on RavenGun's own 64-bit core (**MEASURED** from `game.ini`):
 
-- `[Game] Executable = shell.exe;MIB.exe`, `Is64Bit = false`
-- `[Launch] Mode = direct`, `Arguments = /k=e6222935`
-- `[Loader] Core = ravengun`
-- `[Wine] Prefix = ravengun-test-mib`, `DllOverrides = d3d11,d3d10core,dxgi=n,b`, `Runner = wrapper`
+- `[Game] Type = TeknoParrot`, `EmulationProfile = WartranTroopers`, `Executable = MIB.exe`, 64-bit
+- `[Launch] Mode = direct`, `Dxvk = true`, `BepInEx = 5.4.21.0`
+- `[Loader] Core = ravengun` (RavenGun's own core; with TeknoParrot's closed 64-bit core BepInEx did not load and the game vanished after the logo)
+- `[Display] Gamescope = true`
+- `[Input] Route = tp-shm`, `Layout = WartranTroopers` (a placeholder)
 
-The shell has four start-up checks; on view-local copies of its files all four were passed in the run called m6, and it then launches the game. The shared recipe for this shell family is in [Transformers: Shadows Rising](Transformers-Shadows-Rising).
+**Why a BepInEx plugin:** without the cabinet shell the game stops itself: its client code quits the application when it is not connected to the shell, and its update loop starts the exit sequence when a status challenge goes unanswered. The plugin suppresses both. The launcher places BepInEx next to the exe in a local view folder; the plugin is a normal drop-in copied there.
+
+**Why GStreamer:** the attract is a series of MP4 movies.
 
 ## 5. Input
 
-No input was tried. The cabinet I/O board is only simulated as present for the shell; it delivers no data (the I/O log is full of "Lost HiD Handle" lines). Credits are set to 3 by the shell and the cabinet type to STANDARD.
+Not measured. The placeholder layout is in place; on the cabinet, coin, START and the gun go through the shell's I/O board, which RavenGun does not run now.
 
 ## 6. Timing
 
-Game load about 37 s; the game instance then lived 30 to 52 s before exiting (**MEASURED**, 4-minute run: eight restart cycles). Never held for five minutes.
+**MEASURED** (2026-10-17): the attract was on screen for 2 minutes. Time from double-click to the logo not recorded.
 
 ## 7. What we saw on screen
 
-**MEASURED** (2026-10-14): MIB logo, then the text "PLEASE CALL ATTENDANT - 5 TICKETS OWED / 14 TICKETS OWED". About 4 s after assets finish loading the game quits; the shell logs "Unexpect Game termination, retrying" and starts it again.
+**MEASURED** (2026-10-17): the logo, the attract movies, "PRESS START BUTTON TO JOIN" and FREEPLAY. Earlier, through the shell chain (2026-10-14), the game showed its logo and "PLEASE CALL ATTENDANT - 5 TICKETS OWED", then exited and restarted in a loop.
 
 ## 8. Current state and open questions
 
-- The game quits by its own decision (no crash stack in the Unity log).
-- **Cause not determined.** Two candidates, both present: the game sends a handshake message to the shell twice (10 s apart) that the shell does not answer; and the game logs "NOT Connected to serial" (in a run where an unrelated COM port was visible, it connected and lived slightly longer).
-- Not yet shown: input, sound, an independent capture.
+- The game starts and shows its attract; it is not yet called working.
+- Open: coin, START and the gun (not measured), and a five-minute run.
 
 ## 9. What we tried and what did not work
 
-- Shell as it is, no argument: parks at the first check.
-- With the `/k=` checksum argument: passes the first check, stops at the I/O board check.
-- Local copy of the shell with a small change so it believes an I/O board is present, plus two debug switches in the view's `Game.ini`: all four checks pass, the game launches (run m6).
-- Direct start without the shell: not workable for the full chain.
+- Through the cabinet's shell chain (earlier): the shell's start-up checks could be passed on local copies of its files, but the game quit by itself about 4 seconds after loading, in a loop of eight restarts in four minutes.
+- Direct start on TeknoParrot's closed core: BepInEx did not load, the game vanished after the logo.
+- Direct start on RavenGun's core, with the BepInEx plugin, DXVK and GStreamer: attract on screen (2026-10-17).
 
 ## 10. What is Linux-specific, and what differs on Windows
 
-Wine-specific work: the shell's checks, a serial device that the game opens by itself (on Linux a host serial device may be seen by the game and must be hidden from it), and the DXVK overrides for Unity D3D11. On the cabinet all of this is real hardware. See [Wine-Notes](Wine-Notes).
+Wine-specific work: DXVK overrides for Unity Direct3D 11, GStreamer for the movies, and BepInEx's `winhttp` loader (`winhttp=n,b`). On the cabinet the shell and the I/O hardware are real; here the game runs without the shell and the plugin keeps it from quitting. See [Wine-Notes](Wine-Notes).
 
 This page covers the game and the loader: what you need to run this title and where it gets stuck.

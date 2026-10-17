@@ -1,6 +1,6 @@
 # Far Cry Paradise Lost
 
-**Status:** Not working yet. The game creates its Direct3D 9 device but never draws a frame.
+**Status:** Starts (2026-10-17). Under gamescope with `Windowed = 1` the game shows its attract text ("PULL TRIGGER TO START", free play) on a black background. The background and play have not been measured.
 
 ## 1. Platform and cabinet
 
@@ -22,9 +22,11 @@ The cabinet's `Runme.bat` (**MEASURED** from the file): `subst W: .`, switch to 
 
 - `[Game] Type = TeknoParrot`, `EmulationProfile = FarCry`, `Executable = Farcry_R.exe`
 - `[Launch] Mode = direct`, `Drives = W=.`, `Exe = W:\Farcry_R.exe`
-- `[Wine] Prefix = ravengun-test-dxvk`, `DllOverrides = d3d9=n,b`, `Runner = wrapper`
-- `[Display] Gamescope = false`; in the user layer set `CustomResolution` to 1920x1080 (the game then passes its mode switch)
+- `[Wine] Prefix = ravengun-test-dxvk` (DXVK for Direct3D 9)
+- `[Display] Gamescope = true`, with `Windowed = 1` in the imported config
 - `[Input] Route = tp-shm`, `Layout = FarCryPipe`
+
+**Why `Windowed = 1` under gamescope:** the game asks for exclusive full screen; without gamescope it hung in the mode switch, and under gamescope with `Windowed = 0` its main thread hung in `UpdateWindow`. Windowed under gamescope gets it past both and it draws.
 
 ## 5. Input
 
@@ -32,24 +34,25 @@ Layout `FarCryPipe` (**INFERRED**): test, service, start (P1/P2), trigger (P1/P2
 
 ## 6. Timing
 
-Not measured: no frame is ever presented.
+Not measured yet: neither the time to the attract text nor a five-minute run has been recorded.
 
 ## 7. What we saw on screen
 
-**MEASURED** (2026-10-15): without gamescope at 1920x1080, fullscreen, the D3D9 device is created, but nothing is presented (no DXVK HUD): the main thread runs its message loop and draws nothing. Black picture.
+**MEASURED** (2026-10-17): the attract text "PULL TRIGGER TO START" with FREE PLAY on a black background. Earlier (2026-10-15, without gamescope at 1920x1080) the D3D9 device was created and nothing was presented.
 
 ## 8. Current state and open questions
 
-- Gets past the earlier hangs (window creation, mode switch) but then draws nothing.
-- With the `W:` drive, it stays waiting on the D3D device at about 60% CPU.
-- Open (assumption, not measured): the game waits for cabinet hardware (its I/O or a start condition). Also unknown: whether the `d3dx9_32` from Microsoft would change anything; it did not help when tried.
+- The game reaches its attract text; it is not yet called working.
+- Open: why the background stays black, and input and play (not measured).
+- Earlier hypothesis: the game waits for cabinet hardware (its I/O); not confirmed.
 
 ## 9. What we tried and what did not work
 
-- Under gamescope: the main thread hangs in `UpdateWindow` right after `CreateWindow`/`ShowWindow`.
+- Under gamescope with `Windowed = 0`: the main thread hangs in `UpdateWindow` right after `CreateWindow`/`ShowWindow`.
 - Without gamescope, default mode: hangs in `ChangeDisplaySettings` (switch to 800x600).
-- Without gamescope and with a 1920x1080 custom resolution: passes both, creates the device, no Present.
+- Without gamescope and with a 1920x1080 custom resolution: passes both, creates the device, no Present (the main thread runs its message loop).
 - Microsoft's `d3dx9_32` added: no change (so it is not in the profile).
+- Under gamescope with `Windowed = 1`: the attract text shows (2026-10-17).
 
 ## 10. What is Linux-specific, and what differs on Windows
 

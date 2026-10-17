@@ -4,7 +4,7 @@ RavenGun runs arcade lightgun games on Linux. It starts each game itself — nat
 
 RavenGun ships no games. You need your own legally obtained copies.
 
-This wiki collects what was learned per title, so others can build on it. **38 of 68 titles work** from a double-click (see [Compatibility](Compatibility)); the other pages say where each title stops.
+This wiki collects what was learned per title, so others can build on it. **41 titles are Working** (started with a double-click and played for at least five minutes) and **12 more Start** (the game shows its own logo or attract by double-click; play is not yet measured). Overall (2026-10-17): 52 of 54 counted titles start (96%); Raw Thrills titles are not counted (Police Trainer 2 and Crossfire: Maximum Paintball use Raw Thrills I/O), nor are skipped titles. See [Compatibility](Compatibility); the other pages say where each title stops.
 
 ## How to read a game page
 
@@ -18,16 +18,19 @@ Every game page has the same ten sections: platform and cabinet, what the game n
 - [Official start scripts](Official-Start-Scripts): what the cabinets' own start scripts do, and how RavenGun reads them
 - [Wine notes](Wine-Notes): Wine/Proton fixes and options: movies, DXVK, audio, window handling
 
-## Working (38)
+## Working (41)
 
 - [After Dark](After-Dark) — UNIS PC Based
 - [Bug Busters](Bug-Busters) — EM-Teck PC Based
 - [Drakons: Realm Keepers](Drakons-Realm-Keepers) — Adrenaline Amusements PC-Based
 - [Dream Raiders](Dream-Raiders) — SEGA RingWide
 - [Elevator Action Invasion](Elevator-Action-Invasion) — UNIS PC Based
+- [Gaia Attack 4](Gaia-Attack-4) — Taito Type X2
 - [Gashaaaan!!!!](Gashaaaan) — Konami PC Based
 - [Ghost Squad Evolution](Ghost-Squad-Evolution) — SEGA Lindbergh Red
 - [HALO Fireteam Raven](Halo-Fireteam-Raven) — RAW Thrills Linux PC Based
+- [Haunted Museum](Haunted-Museum) — Taito Type X2
+- [Haunted Museum II](Haunted-Museum-II) — Taito Type X2
 - [The House of the Dead EX](House-of-the-Dead-EX) — SEGA Lindbergh Red
 - [House of the Dead: Scarlet Dawn](House-of-the-Dead-Scarlet-Dawn) — SEGA ALLS
 - [Jurassic Park Arcade](Jurassic-Park-Arcade) — RAW Thrills Linux PC Based
@@ -59,36 +62,39 @@ Every game page has the same ten sections: platform and cabinet, what the game n
 - [Transformers: Shadows Rising](Transformers-Shadows-Rising) — Windows PC
 - [Wild West Shootout](Wild-West-Shootout) — Coastal PC-Based
 
-## Not working yet (30)
+## Starts: attract or title on screen (12)
 
-- [Aliens Armageddon](Aliens-Armageddon) — RAW Thrills Linux PC Based
 - [Aliens: Extermination](Aliens-Extermination) — Global VR PC Based
 - [America's Army Arcade](Americas-Army-Arcade) — Global VR PC Based
-- [Block King Ball Shooter](Block-King-Ball-Shooter) — Type-X PC Based
 - [Cooper's 9](Coopers-9) — KONAMI PC Based
-- [Crossfire: Maximum Paintball](Crossfire-Maximum-Paintball) — Linux PC Based
 - [Elevator Action Death Parade](Elevator-Action-Death-Parade) — Taito Type X2
 - [Far Cry Paradise Lost](Far-Cry-Paradise-Lost) — Global VR PC Based
 - [Friction](Friction) — Unique PC Based
-- [Gaia Attack 4](Gaia-Attack-4) — Taito Type X2
-- [Ghostbusters](Ghostbusters) — ICE/RT Linux PC Based
+- [Infinity Blade FX](Infinity-Blade-FX) — ADRENALINE PC Based
+- [Lost Land Adventure](Lost-Land-Adventure) — Namco ES3X
+- [Men in Black](Men-in-Black) — Windows PC
+- [Robin Hood](Robin-Hood) — ICE PC Based
+- [Silent Scope: Bone Eater](Silent-Scope-Bone-Eater) — Konami PC-Based
+- [Transformers: Human Alliance](Transformers-Human-Alliance) — SEGA RingEdge 2
+
+## Skipped (4)
+
+- [Block King Ball Shooter](Block-King-Ball-Shooter) — Type-X PC Based
 - [Gunslinger Stratos 3](Gunslinger-Stratos-3) — Taito Type X4
-- [Haunted Museum](Haunted-Museum) — Taito Type X2
-- [Haunted Museum II](Haunted-Museum-II) — Taito Type X2
+- [Mighty Moto](Mighty-Moto) — UNIS PC Based
+- [Star Trek Voyager](Star-Trek-Voyager) — Team Play PC Based
+
+## Not working yet (11)
+
+- [Aliens Armageddon](Aliens-Armageddon) — RAW Thrills Linux PC Based
+- [Crossfire: Maximum Paintball](Crossfire-Maximum-Paintball) — Linux PC Based
+- [Ghostbusters](Ghostbusters) — ICE/RT Linux PC Based
 - [The House of the Dead 4](House-of-the-Dead-4) — SEGA Lindbergh Red
 - [The House of the Dead 4 Special](House-of-the-Dead-4-Special) — SEGA Lindbergh Yellow
 - [The House of the Dead III](House-of-the-Dead-III) — SEGA Chihiro
-- [Infinity Blade FX](Infinity-Blade-FX) — ADRENALINE PC Based
-- [Lost Land Adventure](Lost-Land-Adventure) — Namco ES3X
 - [Luigi's Mansion Arcade](Luigis-Mansion) — SEGA Nu 1.1
-- [Men in Black](Men-in-Black) — Windows PC
-- [Mighty Moto](Mighty-Moto) — UNIS PC Based
 - [Police Trainer 2](Police-Trainer-2) — Phantom Systems PC Based
-- [Robin Hood](Robin-Hood) — ICE PC Based
-- [Silent Scope: Bone Eater](Silent-Scope-Bone-Eater) — Konami PC-Based
-- [Star Trek Voyager](Star-Trek-Voyager) — Team Play PC Based
 - [Time Crisis 5](Time-Crisis-5) — Namco ES3X
-- [Transformers: Human Alliance](Transformers-Human-Alliance) — SEGA RingEdge 2
 - [Virtua Cop 3](Virtua-Cop-3) — SEGA Chihiro
 - [Walking Dead](Walking-Dead) — RAW Thrills Linux PC Based
 

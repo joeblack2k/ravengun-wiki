@@ -1,6 +1,6 @@
 # Block King Ball Shooter
 
-**Status:** Not working yet. The game exits with code 1 right after launch.
+**Status:** Skipped (2026-10-16) under the owner's rule for Japanese text without a 16:9 mode: the text is Japanese (measured). The profile is removed and the game folder is moved aside. The page keeps what was measured.
 
 ## 1. Platform and cabinet
 
@@ -19,6 +19,8 @@ No official start script is used. The original cabinet boots Windows straight in
 
 ## 4. The route we use
 
+Skipped, so no route is kept. The profile that was tried:
+
 - `[Game] Type = TeknoParrot`, `EmulationProfile = WartranTroopers`, `Executable = game.exe`
 - `[Launch] Mode = direct`
 - `[Input] Route = tp-shm`, `Layout = WartranTroopers`
@@ -35,16 +37,17 @@ Exit within moments of launch (**MEASURED**, 2026-10-15).
 
 ## 7. What we saw on screen
 
-Nothing usable.
+Nothing usable on screen. The Japanese text was **MEASURED** in the game's own files (2026-10-16).
 
 ## 8. Current state and open questions
 
-- **MEASURED:** a thread faults immediately at address `0x01F5000F`, which belongs to no loaded module, and the process ends with exit code 1.
-- Open: why the game jumps to that address; nothing else could be judged.
+- **Skipped (2026-10-16)** under the owner's rule: Japanese text and/or 4:3 without a 16:9 mode. Reason for this title: the text is Japanese (measured).
+- Earlier finding: a thread faults immediately at an address that belongs to no loaded module, and the process ends with exit code 1.
+- Nothing more is planned for this title.
 
 ## 9. What we tried and what did not work
 
-- Plain direct launch with the `WartranTroopers` layout: exit code 1 as described. No variant tried yet.
+Plain direct launch with the `WartranTroopers` layout: exit code 1 as described. No variant was tried before the title was skipped.
 
 ## 10. What is Linux-specific, and what differs on Windows
 

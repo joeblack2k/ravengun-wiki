@@ -1,6 +1,6 @@
 # America's Army Arcade
 
-**Status:** Not working yet. Never started: the route is prepared and statically checked, and two input questions are open.
+**Status:** Starts (2026-10-16). Double-click runs the native Linux game on RavenGun's route and shows the attract and ranking screens (free play, 4:3 at 800x600). Start/coin keys and aiming are still open.
 
 ## 1. Platform and cabinet
 
@@ -19,11 +19,10 @@ No start script is used. The cabinet starts the Linux program directly; RavenGun
 
 ## 4. The route we use
 
-Native Linux route in a sandbox, under gamescope (**INFERRED** from the route entry, 800x600):
+Native Linux route in a sandbox, under gamescope (the route is switched on since 2026-10-16):
 
 - `[Game] Type = ElfLdr2`, `Executable = armyops-bin`
 - `[Input] Route = evdev`
-- The route entry is currently **disabled**, because the input questions below are unresolved.
 
 The profile defaults (from the profile template): input API RawInput, windowed, free play on, difficulty Medium.
 
@@ -42,21 +41,21 @@ Two open problems (**MEASURED**/**INFERRED**):
 
 ## 6. Timing
 
-Not measured yet.
+Not measured yet: the time to attract and a five-minute run have not been recorded.
 
 ## 7. What we saw on screen
 
-Nothing: the game was never started.
+**MEASURED** (2026-10-16): the attract loop and the ranking screen with FREE PLAY, in a 4:3 picture (800x600) inside the 16:9 output.
 
 ## 8. Current state and open questions
 
-- Never started; only statically examined (2026-10-14): i386 ELF, Unreal Engine 2.
-- Open: map RavenGun's start and coin to F1 and C (or rewrite the keys in `DefUser.ini`), and make the virtual lightgun move the cursor the game reads.
+- The game starts and shows its attract; it is not yet called working.
+- Open: map RavenGun's start and coin to the game's F1 and C (or change the keys in `DefUser.ini`), and make the virtual lightgun move the cursor the game reads; aiming works with a physical mouse only.
 - The difficulty option exists in the profile (Easy, Medium, Hard).
 
 ## 9. What we tried and what did not work
 
-Nothing was tried at runtime. The only investigation was a static one (library dependencies and the input configuration file).
+Static study first (2026-10-14: i386 ELF, Unreal Engine 2, library dependencies, input configuration file), then the native route above. No variants have been needed to reach the attract.
 
 ## 10. What is Linux-specific, and what differs on Windows
 

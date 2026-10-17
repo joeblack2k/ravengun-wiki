@@ -1,6 +1,6 @@
 # Robin Hood
 
-**Status:** Not working yet. The game opens a Direct3D 9 device at 1280x720 but never presents a frame.
+**Status:** Starts (2026-10-17). With `Windowed = 1` under gamescope the game shows its attract ("PRESS START BUTTON", free play). Play has not been measured.
 
 ## 1. Platform and cabinet
 
@@ -20,9 +20,11 @@ No official start script is used. The original cabinet boots Windows straight in
 
 - `[Game] Type = TeknoParrot`, `EmulationProfile = WartranTroopers`, `Executable = game.exe`
 - `[Launch] Mode = direct`
-- `[Wine] Prefix = ravengun-test-dxvk`, `DllOverrides = d3d9=n,b`, `Runner = wrapper`
-- `[Display] Gamescope = true`
+- `[Wine] Prefix = ravengun-test-dxvk` (DXVK for Direct3D 9)
+- `[Display] Gamescope = true`, with `Windowed = 1` in the imported config
 - `[Input] Route = tp-shm`, `Layout = WartranTroopers`
+
+**Why `Windowed = 1`:** with `Windowed = 0` the game created its Direct3D 9 device at 1280x720 but never presented a frame, because it asks for exclusive full screen. Windowed under gamescope draws.
 
 ## 5. Input
 
@@ -30,20 +32,20 @@ Four-player shooter layout (test, service, coins, start, trigger, reload, grenad
 
 ## 6. Timing
 
-Not measured yet.
+Not measured: the time to the attract and a five-minute run have not been recorded.
 
 ## 7. What we saw on screen
 
-**MEASURED** (2026-10-15, with the loader's sampling thread): D3D9 at 1280x720, but no Present; black.
+**MEASURED** (2026-10-17): the attract with PRESS START BUTTON and FREE PLAY. Earlier (2026-10-15) with `Windowed = 0`: the device was created at 1280x720 and nothing was presented.
 
 ## 8. Current state and open questions
 
-- The main thread sits in its message loop and draws nothing; the process uses about 57% CPU, spent in `/proc` reads (`GetThreadTimes`).
-- Open: what the game is waiting for before it draws (assumption: something with the cabinet environment).
+- The game starts and shows its attract; it is not yet called working.
+- Open: coin, START and play (not measured).
 
 ## 9. What we tried and what did not work
 
-- Direct launch with DXVK in gamescope: D3D9 device created, no Present. No variants recorded yet.
+Direct launch with DXVK in gamescope and `Windowed = 0`: D3D9 device created, no Present, the main thread in its message loop with about 57% CPU in `/proc` reads. Fixed by `Windowed = 1`.
 
 ## 10. What is Linux-specific, and what differs on Windows
 

@@ -1,6 +1,6 @@
 # Compatibility
 
-One line per title. **Working** means: started with a double-click in RavenGun on a test machine (a Steam Deck-class PC on a TV, lightgun via PS Move or a mouse) and played for at least five minutes of attract or gameplay. The game page has the details and the date. This is a snapshot of one setup, not a promise.
+One line per title. **Working** means: started with a double-click in RavenGun on a test machine (a Steam Deck-class PC on a TV, lightgun via PS Move or a mouse) and played for at least five minutes of attract or gameplay. **Starts** means: double-click shows the game's own logo, attract or title screen, but play has not been measured yet. **Skipped** means the owner's rule excluded the title (Japanese text and/or a 4:3 picture without a 16:9 mode). Overall (2026-10-17): 52 of 54 counted titles start (96%); Raw Thrills titles are not counted (Police Trainer 2 and Crossfire: Maximum Paintball use Raw Thrills I/O), nor are skipped titles. The game page has the details and the date. This is a snapshot of one setup, not a promise.
 
 | Title | Platform | State |
 |---|---|---|
@@ -9,9 +9,12 @@ One line per title. **Working** means: started with a double-click in RavenGun o
 | [Drakons: Realm Keepers](Drakons-Realm-Keepers) | Adrenaline Amusements PC-Based | Working (2026-10-14) |
 | [Dream Raiders](Dream-Raiders) | SEGA RingWide | Working (2026-10-14) |
 | [Elevator Action Invasion](Elevator-Action-Invasion) | UNIS PC Based | Working (2026-10-14) |
+| [Gaia Attack 4](Gaia-Attack-4) | Taito Type X2 | Working (2026-10-16) |
 | [Gashaaaan!!!!](Gashaaaan) | Konami PC Based | Working (2026-10-14) |
 | [Ghost Squad Evolution](Ghost-Squad-Evolution) | SEGA Lindbergh Red | Working (2026-10-15) |
 | [HALO Fireteam Raven](Halo-Fireteam-Raven) | RAW Thrills Linux PC Based | Working (2026-10-14) |
+| [Haunted Museum](Haunted-Museum) | Taito Type X2 | Working (2026-10-16) |
+| [Haunted Museum II](Haunted-Museum-II) | Taito Type X2 | Working (2026-10-16) |
 | [The House of the Dead EX](House-of-the-Dead-EX) | SEGA Lindbergh Red | Working (2026-10-15) |
 | [House of the Dead: Scarlet Dawn](House-of-the-Dead-Scarlet-Dawn) | SEGA ALLS | Working (2026-10-14) |
 | [Jurassic Park Arcade](Jurassic-Park-Arcade) | RAW Thrills Linux PC Based | Working (2026-10-14) |
@@ -42,34 +45,31 @@ One line per title. **Working** means: started with a double-click in RavenGun o
 | [Too Spicy](Too-Spicy) | SEGA Lindbergh Red | Working (2026-10-15) |
 | [Transformers: Shadows Rising](Transformers-Shadows-Rising) | Windows PC | Working (2026-10-15) |
 | [Wild West Shootout](Wild-West-Shootout) | Coastal PC-Based | Working (2026-10-15) |
+| [Aliens: Extermination](Aliens-Extermination) | Global VR PC Based | Starts (2026-10-17) |
+| [America's Army Arcade](Americas-Army-Arcade) | Global VR PC Based | Starts (2026-10-16) |
+| [Cooper's 9](Coopers-9) | KONAMI PC Based | Starts (2026-10-17) |
+| [Elevator Action Death Parade](Elevator-Action-Death-Parade) | Taito Type X2 | Starts (2026-10-16) |
+| [Far Cry Paradise Lost](Far-Cry-Paradise-Lost) | Global VR PC Based | Starts (2026-10-17) |
+| [Friction](Friction) | Unique PC Based | Starts (2026-10-17) |
+| [Infinity Blade FX](Infinity-Blade-FX) | ADRENALINE PC Based | Starts (2026-10-17) |
+| [Lost Land Adventure](Lost-Land-Adventure) | Namco ES3X | Starts (2026-10-16) |
+| [Men in Black](Men-in-Black) | Windows PC | Starts (2026-10-17) |
+| [Robin Hood](Robin-Hood) | ICE PC Based | Starts (2026-10-17) |
+| [Silent Scope: Bone Eater](Silent-Scope-Bone-Eater) | Konami PC-Based | Starts (2026-10-17) |
+| [Transformers: Human Alliance](Transformers-Human-Alliance) | SEGA RingEdge 2 | Starts (2026-10-17) |
+| [Block King Ball Shooter](Block-King-Ball-Shooter) | Type-X PC Based | Skipped (2026-10-16) |
+| [Gunslinger Stratos 3](Gunslinger-Stratos-3) | Taito Type X4 | Skipped (2026-10-17) |
+| [Mighty Moto](Mighty-Moto) | UNIS PC Based | Skipped (2026-10-17) |
+| [Star Trek Voyager](Star-Trek-Voyager) | Team Play PC Based | Skipped (2026-10-17) |
 | [Aliens Armageddon](Aliens-Armageddon) | RAW Thrills Linux PC Based | Not working yet |
-| [Aliens: Extermination](Aliens-Extermination) | Global VR PC Based | Not working yet |
-| [America's Army Arcade](Americas-Army-Arcade) | Global VR PC Based | Not working yet |
-| [Block King Ball Shooter](Block-King-Ball-Shooter) | Type-X PC Based | Not working yet |
-| [Cooper's 9](Coopers-9) | KONAMI PC Based | Not working yet |
 | [Crossfire: Maximum Paintball](Crossfire-Maximum-Paintball) | Linux PC Based | Not working yet |
-| [Elevator Action Death Parade](Elevator-Action-Death-Parade) | Taito Type X2 | Not working yet |
-| [Far Cry Paradise Lost](Far-Cry-Paradise-Lost) | Global VR PC Based | Not working yet |
-| [Friction](Friction) | Unique PC Based | Not working yet |
-| [Gaia Attack 4](Gaia-Attack-4) | Taito Type X2 | Not working yet |
 | [Ghostbusters](Ghostbusters) | ICE/RT Linux PC Based | Not working yet |
-| [Gunslinger Stratos 3](Gunslinger-Stratos-3) | Taito Type X4 | Not working yet |
-| [Haunted Museum](Haunted-Museum) | Taito Type X2 | Not working yet |
-| [Haunted Museum II](Haunted-Museum-II) | Taito Type X2 | Not working yet |
 | [The House of the Dead 4](House-of-the-Dead-4) | SEGA Lindbergh Red | Not working yet |
 | [The House of the Dead 4 Special](House-of-the-Dead-4-Special) | SEGA Lindbergh Yellow | Not working yet |
 | [The House of the Dead III](House-of-the-Dead-III) | SEGA Chihiro | Not working yet |
-| [Infinity Blade FX](Infinity-Blade-FX) | ADRENALINE PC Based | Not working yet |
-| [Lost Land Adventure](Lost-Land-Adventure) | Namco ES3X | Not working yet |
 | [Luigi's Mansion Arcade](Luigis-Mansion) | SEGA Nu 1.1 | Not working yet |
-| [Men in Black](Men-in-Black) | Windows PC | Not working yet |
-| [Mighty Moto](Mighty-Moto) | UNIS PC Based | Not working yet |
 | [Police Trainer 2](Police-Trainer-2) | Phantom Systems PC Based | Not working yet |
-| [Robin Hood](Robin-Hood) | ICE PC Based | Not working yet |
-| [Silent Scope: Bone Eater](Silent-Scope-Bone-Eater) | Konami PC-Based | Not working yet |
-| [Star Trek Voyager](Star-Trek-Voyager) | Team Play PC Based | Not working yet |
 | [Time Crisis 5](Time-Crisis-5) | Namco ES3X | Not working yet |
-| [Transformers: Human Alliance](Transformers-Human-Alliance) | SEGA RingEdge 2 | Not working yet |
 | [Virtua Cop 3](Virtua-Cop-3) | SEGA Chihiro | Not working yet |
 | [Walking Dead](Walking-Dead) | RAW Thrills Linux PC Based | Not working yet |
 
